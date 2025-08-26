@@ -1,0 +1,4 @@
+export const NEXT_PUBLIC_SUPABASE_URL =
+  "https://awtggattvpytgpwaeahz.supabase.co";
+export const NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3dGdnYXR0dnB5dGdwd2FlYWh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2MzQxNTksImV4cCI6MjA3MTIxMDE1OX0.NBnc8-Xb7big4p8kmStWc_rVtchyjsl2J2r98uJgW_Q";
