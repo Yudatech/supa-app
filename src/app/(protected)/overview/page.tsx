@@ -1,4 +1,3 @@
-// src/app/(protected)/dashboard/page.tsx
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
@@ -11,11 +10,11 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
+    .select("roles")
     .eq("id", data.user.id)
     .single();
-
-  const isAdmin = profile?.role === "admin";
+  const roles = Array.isArray(profile?.roles) ? profile!.roles : [];
+  if (roles.includes("admin")) redirect("/admin");
 
   return (
     <main className="p-6 space-y-6">
@@ -25,11 +24,6 @@ export default async function DashboardPage() {
         <Button asChild>
           <Link href="/posts">Go to Posts</Link>
         </Button>
-        {isAdmin && (
-          <Button variant="secondary" asChild>
-            <Link href="/admin">Admin</Link>
-          </Button>
-        )}
       </div>
     </main>
   );
