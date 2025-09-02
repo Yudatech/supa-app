@@ -8,7 +8,7 @@ export interface User {
   email: string;
   roles: Role[];
   phone?: string;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export type UserOverviewProps = {

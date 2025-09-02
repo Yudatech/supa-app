@@ -1,17 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -59,9 +53,16 @@ import {
 import { Role, User, UserOverviewProps } from "../../lib/types";
 import { SearchHeader } from "./user-search";
 import { RoleBadge, EditRoles } from "./roles";
+import { updateUser } from "../../lib/update-users";
 
 export function UserOverview({ initUsers }: UserOverviewProps) {
+  const router = useRouter();
   const [users, setUsers] = useState<User[]>(initUsers);
+
+  useEffect(() => {
+    setUsers(initUsers ?? []);
+  }, [initUsers]);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -75,24 +76,6 @@ export function UserOverview({ initUsers }: UserOverviewProps) {
     updatedAt: "",
   });
 
-  // 🔁 Load from server route
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch("/api/admin/users", { cache: "no-store" });
-        if (!res.ok) throw new Error(await res.text());
-        const data: User[] = await res.json();
-        if (!cancelled) setUsers(data);
-      } catch (err) {
-        console.error("Failed to load users:", err);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
   const filteredUsers = users.filter(
     (user) =>
       user.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -100,14 +83,24 @@ export function UserOverview({ initUsers }: UserOverviewProps) {
       user.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleEditUser = () => {
+  const handleEditUser = async () => {
     if (!editingUser) return;
+
+    await updateUser({
+      id: editingUser.id,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      phone: formData.phone,
+      roles: formData.roles,
+    });
 
     setUsers(
       users.map((user) =>
         user.id === editingUser.id ? { ...user, ...formData } : user
       )
     );
+
     setEditingUser(null);
     setFormData({
       id: "",

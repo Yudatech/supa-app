@@ -15,14 +15,14 @@ export async function GET() {
   // 2) Require admin
   const { data: myProfile } = await supaServer
     .from("profiles")
-    .select("role")
+    .select("roles")
     // .eq("id", me.id)
     .single();
 
   // add back once auth is finished
-  // if (myProfile?.role !== "admin") {
-  //   return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  // }
+  if (myProfile?.roles.include( "admin")) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
   // 3) Use service role to list users (server-side only!)
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -45,28 +45,33 @@ export async function GET() {
   }
 
   // 4) Get profiles to read names/roles
-  const { data: profiles, error: profilesErr } = await supaServer
-    .from("profiles")
-    .select("id, first_name, last_name, user_name, roles, updated_at")
+const [profilesRes, usersRes] =
+      await Promise.all([
+        supaServer.from("profiles").select("id, user_name, roles, updated_at"),
+        supaServer.from("users").select("profile_id, id, first_name, family_name, email, phone_number"),
+        // supaServer.from("students").select("*"),
+      ]);
 
-  if (profilesErr) {
-    return NextResponse.json({ error: profilesErr.message }, { status: 500 });
+  if (profilesRes.error || usersRes.error) {
+    return NextResponse.json({ error: profilesRes.error?.message || usersRes.error?.message }, { status: 500 });
   }
 
-  const profileById = new Map((profiles ?? []).map((p) => [p.id, p]));
+  const profileById = new Map((profilesRes.data ?? []).map((p) => [p.id, p]));
+
+  const userByProfileId = new Map((usersRes.data ?? []).map((u) => [u.profile_id, u]));
 
   // 5) Shape the data for your table
   const users: User[] = (list?.users ?? []).map((u) => {
     const p = profileById.get(u.id as string);
+    const user = userByProfileId.get(u.id as string);
 
     return {
       id: u.id,
-      lastName: p?.last_name,
-      firstName: p?.first_name,
-      email: u.email ?? p?.user_name ?? null,
+      lastName: user?.family_name,
+      firstName: user?.first_name,
+      email: user?.email ?? p?.user_name ?? null,
       roles: Array.isArray(p?.roles) ? p!.roles : [],
-      phone: u.phone,
-      updatedAt: (u.created_at ?? "").slice(0, 10),
+      phone: user?.phone_number,
     };
   });
 

@@ -2,30 +2,36 @@ import { UserOverview } from "@/components/admin/user-overview";
 import { Navbar } from "@/components/navbar";
 import { createClient } from "@/utils/supabase/server";
 import { User } from "../../../lib/types";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+
+export const runtime = "nodejs";
 
 export default async function Home() {
   const supabase = await createClient();
-  const { data: profiles, error } = await supabase
-    .from("profiles")
-    .select("id, first_name, last_name, user_name, roles, updated_at");
+  const { data: auth, error } = await supabase.auth.getUser();
+  if (error || !auth?.user) redirect("/login");
 
-  if (error) throw error;
+  const h = await headers();
+  const proto = h.get("x-forwarded-proto") ?? "http";
+  const host = h.get("host")!;
+  const url = `${proto}://${host}/api/admin/users`;
 
-  const initUsers: User[] = (profiles ?? []).map((p: any) => {
-    return {
-      id: String(p.id),
-      lastName: p.last_name ?? "",
-      firstName: p.first_name ?? "",
-      email: p.user_name ?? "",
-      roles: p.roles,
-      updatedAt: p.updated_at,
-    };
+  const res = await fetch(url, {
+    headers: { cookie: h.get("cookie") ?? "" },
+    cache: "no-store",
   });
+
+  if (res.status === 401) redirect("/login");
+  if (res.status === 403) redirect("/dashboard");
+  if (!res.ok) throw new Error(await res.text());
+
+  const data: User[] = await res.json();
 
   return (
     <main className="min-h-screen bg-background">
       <Navbar />
-      <UserOverview initUsers={initUsers || []} />
+      <UserOverview initUsers={data} />
     </main>
   );
 }
