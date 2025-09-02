@@ -84,10 +84,14 @@ export function Navbar() {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                onSelect={async (e) => {
-                  e.preventDefault();
-                  const supabase = createClient();
-                  await supabase.auth.signOut();
+                onSelect={async () => {
+                  const res = await fetch("/api/auth/logout", {
+                    method: "POST",
+                  });
+                  if (!res.ok) {
+                    console.error("Logout failed:", await res.text());
+                    return;
+                  }
                   router.replace("/login");
                 }}
               >
