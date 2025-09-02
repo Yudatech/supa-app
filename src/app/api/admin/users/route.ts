@@ -10,7 +10,7 @@ export async function GET() {
   // 1) Require auth
   const { data: auth } = await supaServer.auth.getUser();
   const me = auth?.user;
-  // if (!me) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!me) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   // 2) Require admin
   const { data: myProfile } = await supaServer
@@ -47,7 +47,7 @@ export async function GET() {
   // 4) Get profiles to read names/roles
   const { data: profiles, error: profilesErr } = await supaServer
     .from("profiles")
-    .select("id, first_name, last_name, user_name, roles, updated_at");
+    .select("id, first_name, last_name, user_name, roles, updated_at")
 
   if (profilesErr) {
     return NextResponse.json({ error: profilesErr.message }, { status: 500 });
@@ -63,8 +63,9 @@ export async function GET() {
       id: u.id,
       lastName: p?.last_name,
       firstName: p?.first_name,
-      email: p?.user_name,
-      roles: p?.roles,
+      email: u.email ?? p?.user_name ?? null,
+      roles: Array.isArray(p?.roles) ? p!.roles : [],
+      phone: u.phone,
       updatedAt: (u.created_at ?? "").slice(0, 10),
     };
   });

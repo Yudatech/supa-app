@@ -95,9 +95,9 @@ export function UserOverview({ initUsers }: UserOverviewProps) {
 
   const filteredUsers = users.filter(
     (user) =>
-      user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+      user.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleEditUser = () => {
@@ -167,7 +167,7 @@ export function UserOverview({ initUsers }: UserOverviewProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {users.filter((user) => user.roles.includes("admin")).length}
+              {users.filter((user) => user.roles?.includes("admin")).length}
             </div>
           </CardContent>
         </Card>
@@ -182,8 +182,9 @@ export function UserOverview({ initUsers }: UserOverviewProps) {
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
                   <TableHead>Role</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Phone Number</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -193,12 +194,13 @@ export function UserOverview({ initUsers }: UserOverviewProps) {
                     <TableCell className="font-medium">
                       {`${user.lastName} ${user.firstName}`}
                     </TableCell>
-                    <TableCell>{user.email}</TableCell>
                     <TableCell>
                       {user.roles.map((role) => (
                         <RoleBadge key={`${user.id}-${role}`} role={role} />
                       ))}
                     </TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.phone || ""}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <Button

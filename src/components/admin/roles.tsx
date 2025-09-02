@@ -1,6 +1,13 @@
 import { Badge } from "@/components/ui/badge";
 import { Role, User } from "../../lib/types";
-import { Users, Shield, UserCheck, X } from "lucide-react";
+import {
+  Users,
+  Shield,
+  UserCheck,
+  X,
+  GraduationCap,
+  Speech,
+} from "lucide-react";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -26,7 +33,9 @@ const getRoleIcon = (role: Role) => {
     case "admin":
       return <Shield className="h-4 w-4" />;
     case "teacher":
-      return <UserCheck className="h-4 w-4" />;
+      return <Speech className="h-4 w-4" />;
+    case "master":
+      return <GraduationCap className="h-4 w-4" />;
     default:
       return <Users className="h-4 w-4" />;
   }
@@ -38,6 +47,8 @@ const getRoleBadgeVariant = (role: Role) => {
       return "destructive";
     case "teacher":
       return "secondary";
+    case "master":
+      return "default";
     default:
       return "outline";
   }
@@ -95,6 +106,12 @@ export function EditRoles({ roles, formData, setFormData }: RolesProp) {
             disabled={formData.roles.includes("teacher")}
           >
             Teacher
+          </SelectItem>
+          <SelectItem
+            value="master"
+            disabled={formData.roles.includes("master")}
+          >
+            Master
           </SelectItem>
           <SelectItem value="admin" disabled={formData.roles.includes("admin")}>
             Admin

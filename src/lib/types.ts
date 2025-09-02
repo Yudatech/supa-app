@@ -1,5 +1,5 @@
 // roles allowed by your UI
-export type Role = "admin" | "user" | "teacher";
+export type Role = "admin" | "user" | "teacher" | "master";
 
 export interface User {
   id: string;
@@ -7,6 +7,7 @@ export interface User {
   firstName: string;
   email: string;
   roles: Role[];
+  phone?: string;
   updatedAt: string;
 }
 
