@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Navbar } from "../../../components/navbar";
 
 export default async function OverviewPage() {
   const supabase = await createClient();
@@ -11,22 +12,27 @@ export default async function OverviewPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("roles")
+    .select("id, first_name, last_name, email, phone_number, roles, updated_at")
     .eq("id", data.user.id)
     .single();
   const roles = Array.isArray(profile?.roles) ? profile!.roles : [];
 
+  if (!profile) redirect("/signup");
   if (roles.includes("admin")) redirect("/admin");
+
+  const user = {
+    id: profile.id,
+    firstName: profile.first_name,
+    lastName: profile.last_name,
+    email: profile.email,
+    phone: profile.phone_number,
+    roles: profile.roles,
+    updatedAt: profile.updated_at,
+  };
 
   return (
     <main className="p-6 space-y-6">
-      <h1 className="text-2xl font-semibold">Dashboard</h1>
-      <p className="text-sm opacity-80">Signed in as {data?.user?.id}</p>
-      <div className="flex gap-2">
-        <Button asChild>
-          <Link href="/posts">Go to Posts</Link>
-        </Button>
-      </div>
+      <Navbar auth={{ authUser: user }} />
     </main>
   );
 }

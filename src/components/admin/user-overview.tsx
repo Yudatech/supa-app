@@ -4,17 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -54,8 +43,9 @@ import { Role, User, UserOverviewProps } from "../../lib/types";
 import { SearchHeader } from "./user-search";
 import { RoleBadge, EditRoles } from "./roles";
 import { updateUser } from "../../lib/update-users";
+import { UserEditDialog } from "../user-edit-dialog";
 
-export function UserOverview({ initUsers }: UserOverviewProps) {
+export function UserOverview({ initUsers, authUser }: UserOverviewProps) {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>(initUsers);
 
@@ -66,7 +56,7 @@ export function UserOverview({ initUsers }: UserOverviewProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [editingUser] = useState<User | null>(null);
   const [formData, setFormData] = useState<User>({
     id: "",
     firstName: "",
@@ -83,35 +73,35 @@ export function UserOverview({ initUsers }: UserOverviewProps) {
       user.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleEditUser = async () => {
-    if (!editingUser) return;
+  // const handleEditUser = async () => {
+  //   if (!editingUser) return;
 
-    await updateUser({
-      id: editingUser.id,
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      phone: formData.phone,
-      roles: formData.roles,
-    });
+  //   await updateUserAdmin({
+  //     id: editingUser.id,
+  //     firstName: formData.firstName,
+  //     lastName: formData.lastName,
+  //     email: formData.email,
+  //     phone: formData.phone,
+  //     roles: formData.roles, // only admins can set; others omit
+  //   });
 
-    setUsers(
-      users.map((user) =>
-        user.id === editingUser.id ? { ...user, ...formData } : user
-      )
-    );
+  //   setUsers(
+  //     users.map((user) =>
+  //       user.id === editingUser.id ? { ...user, ...formData } : user
+  //     )
+  //   );
 
-    setEditingUser(null);
-    setFormData({
-      id: "",
-      firstName: "",
-      lastName: "",
-      email: "",
-      roles: [],
-      updatedAt: "",
-    });
-    setIsEditDialogOpen(false);
-  };
+  //   setEditingUser(null);
+  //   setFormData({
+  //     id: "",
+  //     firstName: "",
+  //     lastName: "",
+  //     email: "",
+  //     roles: [],
+  //     updatedAt: "",
+  //   });
+  //   setIsEditDialogOpen(false);
+  // };
 
   // const handleDeleteUser = (userId: string) => {
   //   setUsers(users.filter((user) => user.id !== userId));
@@ -247,108 +237,13 @@ export function UserOverview({ initUsers }: UserOverviewProps) {
       </Card>
 
       {/* Edit Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
-            <DialogDescription>
-              Update the user account details below.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="edit-name">First Name</Label>
-              <Input
-                id="edit-name"
-                value={formData.firstName}
-                onChange={(e) =>
-                  setFormData({ ...formData, firstName: e.target.value })
-                }
-                placeholder="Enter full name"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="edit-name">Last Name</Label>
-              <Input
-                id="edit-name"
-                value={formData.lastName}
-                onChange={(e) =>
-                  setFormData({ ...formData, lastName: e.target.value })
-                }
-                placeholder="Enter full name"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="edit-email">Email</Label>
-              <Input
-                id="edit-email"
-                type="email"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                placeholder="Enter email address"
-              />
-            </div>
-            <EditRoles
-              roles={formData.roles}
-              formData={formData}
-              setFormData={setFormData}
-            />
-            {/* <div className="grid gap-2">
-              <Label htmlFor="edit-role">Role</Label>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {formData.roles.map((role) => (
-                  <Badge
-                    key={role}
-                    variant={getRoleBadgeVariant(role)}
-                    className="gap-1"
-                  >
-                    {getRoleIcon(role)}
-                    {role}
-                    <button
-                      type="button"
-                      onClick={() => removeRole(role)}
-                      className="ml-1 hover:bg-black/20 rounded-full p-0.5"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                ))}
-              </div>
-              <Select
-                value={formData.role}
-                onValueChange={(value: User["role"]) =>
-                  setFormData({ ...formData, role: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="user">User</SelectItem>
-                  <SelectItem value="moderator">Moderator</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                </SelectContent>
-              </Select>
-            </div> */}
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsEditDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleEditUser}
-              disabled={!formData.email || formData.roles.length < 1}
-            >
-              Save Changes
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {isEditDialogOpen && (
+        <UserEditDialog
+          auth={authUser}
+          isEditDialogOpen={isEditDialogOpen}
+          setIsEditDialogOpen={setIsEditDialogOpen}
+        />
+      )}
     </div>
   );
 }

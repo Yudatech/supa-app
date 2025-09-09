@@ -1,5 +1,5 @@
 import { UserOverview } from "@/components/admin/user-overview";
-import { Navbar } from "@/components/navbar";
+import { Navbar } from "../../../components/navbar";
 import { createClient } from "@/utils/supabase/server";
 import { User } from "../../../lib/types";
 import { headers } from "next/headers";
@@ -28,10 +28,16 @@ export default async function Home() {
 
   const data: User[] = await res.json();
 
+  const authUser: User = data.filter((d) => d.id === auth.user.id)?.[0];
+
+  if (!authUser) return null;
+
+  const authed = { authUser: authUser };
+
   return (
     <main className="min-h-screen bg-background">
-      <Navbar />
-      <UserOverview initUsers={data} />
+      <Navbar auth={authed} />
+      <UserOverview initUsers={data} authUser={authUser} />
     </main>
   );
 }

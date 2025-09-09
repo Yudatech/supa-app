@@ -9,9 +9,6 @@ export default function LoginPage({
 }: {
   searchParams?: { error?: string; checkInbox?: string };
 }) {
-  const error = searchParams?.error;
-  const checkInbox = searchParams?.checkInbox;
-
   return (
     <div className="grid place-items-center min-h-dvh p-6">
       <Card className="w-full max-w-sm">
@@ -19,16 +16,16 @@ export default function LoginPage({
           <CardTitle>Welcome</CardTitle>
         </CardHeader>
         <CardContent>
-          {error && (
+          {/* {error && (
             <p className="mb-3 text-sm text-destructive" role="alert">
               {decodeURIComponent(error)}
             </p>
-          )}
-          {checkInbox && (
+          )} */}
+          {/* {checkInbox && (
             <p className="mb-3 text-sm opacity-80" role="status">
               Check your inbox to confirm your email.
             </p>
-          )}
+          )} */}
           <form className="space-y-4">
             <div className="space-y-1">
               <Label htmlFor="email">Email</Label>

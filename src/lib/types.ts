@@ -13,4 +13,9 @@ export interface User {
 
 export type UserOverviewProps = {
   initUsers: User[];
+  authUser: User;
 };
+
+export type ProfileProps = {
+  auth: User | null
+}

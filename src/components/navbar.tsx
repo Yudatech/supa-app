@@ -14,9 +14,16 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
+import type { User as UserProps, ProfileProps } from "../lib/types";
+import { useState } from "react";
+import { UserEditDialog } from "./user-edit-dialog";
 
-export function Navbar() {
+type Props = { auth: { authUser: UserProps } };
+
+export function Navbar({ auth }: Props) {
   const router = useRouter();
+
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 justify-between px-6">
@@ -74,7 +81,7 @@ export function Navbar() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setIsEditDialogOpen(true)}>
                 <User className="mr-2 h-4 w-4" />
                 <span>Profile</span>
               </DropdownMenuItem>
@@ -102,6 +109,14 @@ export function Navbar() {
           </DropdownMenu>
         </div>
       </div>
+
+      {isEditDialogOpen && (
+        <UserEditDialog
+          auth={auth.authUser}
+          isEditDialogOpen={isEditDialogOpen}
+          setIsEditDialogOpen={setIsEditDialogOpen}
+        />
+      )}
     </nav>
   );
 }
