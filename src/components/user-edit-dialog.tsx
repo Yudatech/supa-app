@@ -45,7 +45,13 @@ export const UserEditDialog: React.FC<{
       email: formData.email,
       phone: formData.phone,
       roles: formData.roles, // only admins can set; others omit
+    }).catch((error) => {
+      console.error("Error updating user:", error);
+      alert("Error updating user: " + error.message);
     });
+
+    setIsEditDialogOpen(false);
+    alert("User Profile successfully updated!");
   };
 
   const isAdmin = auth.roles.includes("admin");
