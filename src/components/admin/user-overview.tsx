@@ -73,42 +73,7 @@ export function UserOverview({ initUsers, authUser }: UserOverviewProps) {
       user.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // const handleEditUser = async () => {
-  //   if (!editingUser) return;
-
-  //   await updateUserAdmin({
-  //     id: editingUser.id,
-  //     firstName: formData.firstName,
-  //     lastName: formData.lastName,
-  //     email: formData.email,
-  //     phone: formData.phone,
-  //     roles: formData.roles, // only admins can set; others omit
-  //   });
-
-  //   setUsers(
-  //     users.map((user) =>
-  //       user.id === editingUser.id ? { ...user, ...formData } : user
-  //     )
-  //   );
-
-  //   setEditingUser(null);
-  //   setFormData({
-  //     id: "",
-  //     firstName: "",
-  //     lastName: "",
-  //     email: "",
-  //     roles: [],
-  //     updatedAt: "",
-  //   });
-  //   setIsEditDialogOpen(false);
-  // };
-
-  // const handleDeleteUser = (userId: string) => {
-  //   setUsers(users.filter((user) => user.id !== userId));
-  // };
-
   const openEditDialog = (user: User) => {
-    setEditingUser(user);
     setFormData({
       id: user.id,
       firstName: user.firstName,

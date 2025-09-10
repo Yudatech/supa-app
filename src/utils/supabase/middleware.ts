@@ -1,21 +1,14 @@
+import { createServerClient } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
 
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import { type NextRequest, NextResponse } from "next/server";
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-export const createClient = (request: NextRequest) => {
-  // Create an unmodified response
+export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
+    request,
+  })
 
   const supabase = createServerClient(
-    supabaseUrl!,
-    supabaseKey!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll() {
@@ -31,8 +24,11 @@ export const createClient = (request: NextRequest) => {
           )
         },
       },
-    },
-  );
+    }
+  )
+
+  // refreshing the auth token
+  await supabase.auth.getUser()
 
   return supabaseResponse
-};
+}

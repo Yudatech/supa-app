@@ -15,6 +15,9 @@ export default async function OverviewPage() {
     .select("id, first_name, last_name, email, phone_number, roles, updated_at")
     .eq("id", data.user.id)
     .single();
+
+  console.log("profile", data);
+
   const roles = Array.isArray(profile?.roles) ? profile!.roles : [];
 
   if (!profile) redirect("/signup");

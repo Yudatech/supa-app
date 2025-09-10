@@ -10,6 +10,7 @@ export const runtime = "nodejs";
 export default async function Home() {
   const supabase = await createClient();
   const { data: auth, error } = await supabase.auth.getUser();
+
   if (error || !auth?.user) redirect("/login");
 
   const h = await headers();

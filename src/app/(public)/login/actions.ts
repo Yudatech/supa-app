@@ -1,46 +1,59 @@
-"use server";
-import { redirect } from "next/navigation";
-import { createClient } from "@/utils/supabase/server";
+'use server'
+import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
+import { createClient } from '@/utils/supabase/server'
 
 // NOTE: Using <Button formAction={login}> requires this action to return void.
 export async function login(formData: FormData): Promise<void> {
-  const email = String(formData.get("email"));
-  const password = String(formData.get("password"));
-
+  // const email = String(formData.get("email"));
+  // const password = String(formData.get("password"));
   const supabase = await createClient();
 
-  // Sign in
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+   // type-casting here for convenience
+  // in practice, you should validate your inputs
+  const data = {
+    email: formData.get('email') as string,
+    password: formData.get('password') as string,
+  }
+  const { error } = await supabase.auth.signInWithPassword(data)
   if (error) {
-    redirect(`/login?error=${encodeURIComponent(error.message)}`);
+    redirect('/error')
   }
+  revalidatePath('/', 'layout')
+  redirect('/overview')
 
-  // Get current user
-  const { data: auth } = await supabase.auth.getUser();
-  const userId = auth?.user?.id;
+  // // Sign in
+  // const { error } = await supabase.auth.signInWithPassword({ email, password });
+  // if (error) {
+  //   redirect(`/login?error=${encodeURIComponent(error.message)}`);
+  // }
 
-  // Default role if profile missing
-  let role: string | undefined = "user";
+  // // Get current user
+  // const { data: auth } = await supabase.auth.getUser();
+  // const userId = auth?.user?.id;
 
-  if (userId) {
-    // (Optional) backfill profile row if using the ensure_profile() RPC
-    // await supabase.rpc("ensure_profile");
+  // // Default role if profile missing
+  // let role: string | undefined = "user";
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", userId)
-      .single();
+  // if (userId) {
+  //   // (Optional) backfill profile row if using the ensure_profile() RPC
+  //   // await supabase.rpc("ensure_profile");
 
-    role = profile?.role ?? "user";
-  }
+  //   const { data: profile } = await supabase
+  //     .from("profiles")
+  //     .select("role")
+  //     .eq("id", userId)
+  //     .single();
 
-  // Role-based redirect
-  if (role === "admin") {
-    redirect("/admin");
-  }
+  //   role = profile?.role ?? "user";
+  // }
 
-  redirect("/overview");
+  // // Role-based redirect
+  // if (role === "admin") {
+  //   redirect("/admin");
+  // }
+
+  // redirect("/overview");
 }
 
 export async function signup(formData: FormData): Promise<void> {

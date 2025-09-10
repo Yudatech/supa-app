@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Dialog,
   DialogContent,
@@ -9,12 +11,12 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { use, useState } from "react";
 import type { User } from "../lib/types";
 import { Button } from "@/components/ui/button";
 import { EditRoles } from "./admin/roles";
 import { updateUser } from "../lib/update-users";
-import { createClient } from "@/utils/supabase/server";
+// import { createClient } from "@/utils/supabase/server";
 
 export const UserEditDialog: React.FC<{
   auth: User;
@@ -33,20 +35,8 @@ export const UserEditDialog: React.FC<{
 
   // const [editingUser, setEditingUser] = useState<User | null>(null);
 
-  const handleEditUser = (formData: User) => {
+  const handleEditUser = async (formData: User) => {
     if (!formData) return;
-
-    // const { error } = await supabase
-    //   .from("users")
-    //   .update({
-    //     id: auth.id,
-    //     firstName: formData.firstName,
-    //     lastName: formData.lastName,
-    //     email: formData.email,
-    //     phone: formData.phone,
-    //     // roles: formData.roles, // only admins can set; others omit
-    //   })
-    //   .eq("profile_id", auth.id);
 
     updateUser({
       id: auth.id,
