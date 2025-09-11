@@ -20,8 +20,8 @@ export default async function OverviewPage() {
 
   const roles = Array.isArray(profile?.roles) ? profile!.roles : [];
 
-  if (!profile) redirect("/signup");
-  if (roles.includes("admin")) redirect("/admin");
+  if (!profile) redirect("/login");
+  // if (roles.includes("admin")) redirect("/admin");
 
   const user = {
     id: profile.id,
